@@ -3,3 +3,6 @@ export PGPORT=9999
 export PGDATA=/opt/pgsql/data
 export PGDATABASE=pgmaster
 export PGUSER=postgres
+
+#export virtual python (with pylamid)
+export PATH=~/env/bin:${PATH}
