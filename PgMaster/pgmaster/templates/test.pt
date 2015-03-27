@@ -48,6 +48,13 @@
               <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="http://pylonsproject.org">Pylons Project</a></li>
           </div>
         </div>
+	<div>
+	  <form action="${myself}" method="get">
+	    <input type="submit" name="9.2" value="REL9_2_STABLE"/>
+	    <input type="submit" name="9.1" value="REL9_1_STABLE"/>
+	  </form>
+	</div>
+	<div> ${check} </div>
         <div class="row">
           <div class="copyright">
             Copyright &copy; Pylons Project
