@@ -24,6 +24,21 @@
   </head>
 
   <body>
+    <div>
+      <form action="${myself}" method="get">
+	<input type="submit" name="9.4" value="REL9_4_STABLE"/>
+	<input type="submit" name="9.3" value="REL9_3_STABLE"/>
+	<input type="submit" name="9.2" value="REL9_2_STABLE"/>
+	<input type="submit" name="9.1" value="REL9_1_STABLE"/>
+	<input type="submit" name="9.0" value="REL9_0_STABLE"/>
+	<input type="submit" name="8.4" value="REL8_4_STABLE"/>
+	<input type="text"   name="keyword" size="30" maxlength="20"/>
+      </form>
+      ${check}
+    </div>
+    <div>
+      <pre>${test}</pre>
+    </div>
 
     <div class="starter-template">
       <div class="container">
@@ -34,7 +49,6 @@
           <div class="col-md-10">
             <div class="content">
               <h1><span class="font-semi-bold">Pyramid</span> <span class="smaller">Starter scaffold</span></h1>
-              <p class="lead"><span class="font-normal">${test}</span></p>
             </div>
           </div>
         </div>
@@ -48,13 +62,6 @@
               <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="http://pylonsproject.org">Pylons Project</a></li>
           </div>
         </div>
-	<div>
-	  <form action="${myself}" method="get">
-	    <input type="submit" name="9.2" value="REL9_2_STABLE"/>
-	    <input type="submit" name="9.1" value="REL9_1_STABLE"/>
-	  </form>
-	</div>
-	<div> ${check} </div>
         <div class="row">
           <div class="copyright">
             Copyright &copy; Pylons Project
