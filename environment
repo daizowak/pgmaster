@@ -6,3 +6,4 @@ export PGUSER=postgres
 
 #export virtual python (with pylamid)
 export PATH=~/env/bin:${PATH}
+export C_INCLUDE_PATH=/usr/pgsql-9.3/include
