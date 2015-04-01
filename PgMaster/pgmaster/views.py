@@ -33,7 +33,7 @@ def front(request):
 
     try:
         # Select commit database limit 50
-        records=DBSession.execute("select commitid,scommitid,seclevel,snote,commitdate from " + check + " order by logid desc limit 50").fetchall()
+        records=DBSession.execute("select commitid,scommitid,seclevel,snote,commitdate from " + check + " order by commitdate desc,logid limit 50").fetchall()
     except DBAPIError:
         return Response(conn_err_msg,content_type='text/plain', status_int=500)
 
