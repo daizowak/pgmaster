@@ -32,7 +32,7 @@
       </div>    
     </div>
     <div>
-      <form action="${myself}" method="get">
+      <form action="${myself}" method="post">
 	<input type="submit" name="branch" value="REL9_4_STABLE"/>
 	<input type="submit" name="branch" value="REL9_3_STABLE"/>
 	<input type="submit" name="branch" value="REL9_2_STABLE"/>
@@ -44,13 +44,13 @@
 	<tr>
 	<th>commitdate</th><th>commitid</th><th>scommitid</th><th>seclevel</th><th>snote</th>
 	</tr>
-	<tal:block repeat="record records">
+	<tal:block repeat="row records">
 	  <tr>
-	  <td><div tal:content="record[4]"/></td>
-	  <td><a href="${detail}?commitid=${record[0]}&branch=${check}"><div tal:content="record[0]"/></a></td>
-	  <td><div tal:content="record[1]"/></td>
-	  <td><div tal:content="record[2]"/></td>
-	  <td><div tal:content="record[3]"/></td>
+	  <td><div tal:content="row.commitdate"/></td>
+	  <td><a href="${detail}?commitid=${row.commitid}&branch=${check}"><div tal:content="row.commitid"/></a></td>
+	  <td><div tal:content="row.scommitid"/></td>
+	  <td><div tal:content="row.seclevel"/></td>
+	  <td><div tal:content="row.snote"/></td>
 	  </tr>
 	</tal:block>
       </table>

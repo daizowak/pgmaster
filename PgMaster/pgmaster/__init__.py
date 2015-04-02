@@ -23,6 +23,7 @@ def main(global_config, **settings):
     
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
+    Base.metadata.create_all(engine)
     Base.metadata.bind = engine
 
     return config.make_wsgi_app()

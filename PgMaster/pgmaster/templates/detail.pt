@@ -37,12 +37,18 @@
     </div>
 
     <div>
-      <form action="${myself}" method="get">
+      <form action="${myself}" method="post">
 	<input type="hidden" name="commitid" value="${commitid}"><br/>
 	<input type="hidden" name="branch" value="${branch}"><br/>
-	security-level<textarea name="seclevel" tal:content="record[0]" rows="1" cols="10"><br/>
-	short note<textarea name="snote" tal:content="record[1]" rows="1" cols="100"/><br/>
-	long note<textarea name="note" tal:content="record[2]" rows="10" cols="100"/><br/>
+	LASTUPDATE: ${record.updatetime}<br/><br/>
+	revision       <textarea name="revision" tal:content="record.revision" rows="1" cols="10"><br/>
+	bug-level      <textarea name="buglevel" tal:content="record.buglevel" rows="1" cols="20"><br/> 
+	security-level <textarea name="seclevel" tal:content="record.seclevel" rows="1" cols="10"><br/>
+	short note     <textarea name="snote" tal:content="record.snote" rows="1" cols="100"/><br/>
+	long note      <textarea name="note" tal:content="record.note" rows="10" cols="100"/><br/>
+	url            <textarea name="releurl" tal:content="record.releurl" rows="1" cols="100"/><br/>
+        analysys       <textarea name="analysys" tal:content="record.analysys" rows="10" cols="100"/><br/>
+	genre          <textarea name="genre" tal:content="record.genre" rows="3" cols="30"/><br/>
 	<input type="submit" name="upload" value="Save"/>
       </form>
     </div>

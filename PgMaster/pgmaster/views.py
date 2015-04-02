@@ -13,8 +13,8 @@ import datetime
 
 from sqlalchemy.exc import DBAPIError
 from .models import (
+    Base,
     DBSession,
-    PatchRecord
     )
 
 @view_config(route_name='home', renderer='templates/mytemplate.pt')
@@ -29,13 +29,10 @@ def front(request):
         check = request.params['branch']
     commands.getoutput("git checkout " + check)
 
-    Object1=PatchRecord
-
-    try:
-        # Select commit database limit 50
-        records=DBSession.execute("select commitid,scommitid,seclevel,snote,commitdate from " + check + " order by commitdate desc,logid limit 50").fetchall()
-    except DBAPIError:
-        return Response(conn_err_msg,content_type='text/plain', status_int=500)
+    # Select commit database limit 50
+    tblname=str(check).lower()
+    ormtype=type(tblname,(Base,),{'__tablename__':tblname,'__table_args__':{'autoload':True}})
+    records= DBSession.query(ormtype).order_by(ormtype.commitdate.desc(),ormtype.logid).limit(50).all()
 
     return dict(myself=request.route_url('front'),check=check,records=records,detail=request.route_url('detail'))
 
@@ -50,28 +47,40 @@ def detail(request):
 
     commitid=request.params['commitid']
     result=commands.getoutput("git log -c -n 1 " + commitid )
+    tblname=str(check).lower()
+    ormtype=type(tblname,(Base,),{'__tablename__':tblname,'__table_args__':{'autoload':True}})
 
     if 'upload' in request.params:
-        # UPDATE 
+
+        buglevel=request.params['buglevel']
         seclevel=request.params['seclevel']
         snote=request.params['snote']
         note=request.params['note']
-        DBSession.execute("update " + check + " set " + 
-                          " seclevel = '" + seclevel + "'," +
-                          " snote = '"    + snote    + "'," +
-                          " note = '"     + note     + "'"  +
-                          " where commitid='" + commitid +"';")
+        revision=request.params['revision']
+        releurl=request.params['releurl']
+        genre=request.params['genre']
+        analysys=request.params['analysys']
+        
+
+        # UPDATE
+        DBSession.query(ormtype).filter(ormtype.commitid == commitid).update(
+            {"buglevel":buglevel,
+             "seclevel":seclevel,
+             "snote":snote,
+             "note":note,
+             "revision":revision,
+             "releurl":releurl,
+             "genre":genre,
+             "analysys":analysys,
+             })
+        DBSession.flush()
 
     try:
         # Search commit information.
-        records=DBSession.execute("select seclevel,snote,note from " + check + " where commitid='" + commitid + "'").fetchall()
+        record= DBSession.query(ormtype).filter(ormtype.commitid == commitid).one()
     except DBAPIError:
         return Response(conn_err_msg,content_type='text/plain',status_init=500)
     
-    global record
-    for row in records:
-        record=row
-
     return dict(myself=request.route_url('detail'),detail=result.decode('utf-8'),record=record,commitid=commitid,branch=check)
 
 
@@ -90,3 +99,6 @@ def log(request):
 
     result=commands.getoutput("git log --grep=\"" + word  + "\"")
     return dict(test=result.decode('utf-8'),myself=request.route_url('log'),check=check)
+
+
+conn_err_msg="SQLAlchemy error occured..."
