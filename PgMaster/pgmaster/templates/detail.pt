@@ -52,6 +52,12 @@
 	<input type="submit" name="upload" value="Save"/>
       </form>
     </div>
+
+
+    <div>
+      <pre>${diff}</pre>
+    </div>
+
  
     <!-- Bootstrap core JavaScript
     ================================================== -->

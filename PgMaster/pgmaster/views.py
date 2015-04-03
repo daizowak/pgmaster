@@ -46,7 +46,8 @@ def detail(request):
     commands.getoutput("git checkout " + check)
 
     commitid=request.params['commitid']
-    result=commands.getoutput("git log -c -n 1 " + commitid )
+    description=commands.getoutput("git log --stat -1 " + commitid )
+    diff=commands.getoutput("git log -p -1 --pretty=format: " + commitid )
     tblname=str(check).lower()
     ormtype=type(tblname,(Base,),{'__tablename__':tblname,'__table_args__':{'autoload':True}})
 
@@ -81,7 +82,7 @@ def detail(request):
     except DBAPIError:
         return Response(conn_err_msg,content_type='text/plain',status_init=500)
     
-    return dict(myself=request.route_url('detail'),detail=result.decode('utf-8'),record=record,commitid=commitid,branch=check)
+    return dict(myself=request.route_url('detail'),detail=description.decode('utf-8'),diff=diff,record=record,commitid=commitid,branch=check)
 
 
 @view_config(route_name='log',renderer='templates/log.pt')
