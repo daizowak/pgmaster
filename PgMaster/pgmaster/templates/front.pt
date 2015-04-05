@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!Doctype html>
 <html lang="${request.locale_name}">
   <head>
     <meta charset="utf-8">
@@ -40,6 +40,14 @@
 	<input type="submit" name="branch" value="REL9_0_STABLE"/>
 	<input type="submit" name="branch" value="REL8_4_STABLE"/>
       </form>
+    </div>
+    <div>
+      <form action="${myself}" method="get">
+	<input type="hidden" name="branch" value="${check}"/>
+	<input type="date" name="date" value=""/>
+	<input type="submit" value="change"/>
+    </div>
+    <div>
       <table>
 	<tr>
 	<th>commitdate</th><th>commitid</th><th>scommitid</th><th>seclevel</th><th>snote</th>

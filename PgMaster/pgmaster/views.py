@@ -32,7 +32,10 @@ def front(request):
     # Select commit database limit 50
     tblname=str(check).lower()
     ormtype=type(tblname,(Base,),{'__tablename__':tblname,'__table_args__':{'autoload':True}})
-    records= DBSession.query(ormtype).order_by(ormtype.commitdate.desc(),ormtype.logid).limit(50).all()
+    if 'date' in request.params:
+        records=DBSession.query(ormtype).filter(ormtype.commitdate<=request.params['date']).order_by(ormtype.commitdate.desc(),ormtype.logid).limit(50).all()
+    else:
+        records= DBSession.query(ormtype).order_by(ormtype.commitdate.desc(),ormtype.logid).limit(50).all()
 
     return dict(myself=request.route_url('front'),check=check,records=records,detail=request.route_url('detail'))
 
