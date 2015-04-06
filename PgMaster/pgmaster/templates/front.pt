@@ -8,7 +8,7 @@
     <meta name="author" content="Pylons Project">
     <link rel="shortcut icon" href="${request.static_url('pgmaster:static/pyramid-16x16.png')}">
 
-    <title>Pyramid Test Page</title>
+    <title>PostgreSQL CommitLog Database(Main Page)</title>
 
     <!-- Bootstrap core CSS -->
     <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
@@ -42,21 +42,25 @@
       </form>
     </div>
     <div>
-      <form action="${myself}" method="get">
+      <form action="${myself}" method="post">
 	<input type="hidden" name="branch" value="${check}"/>
 	<input type="date" name="date" value=""/>
 	<input type="submit" value="change"/>
     </div>
     <div>
-      <table>
+      <table class="table">
 	<tr>
-	<th>commitdate</th><th>commitid</th><th>scommitid</th><th>seclevel</th><th>snote</th>
+	<th>commitdate</th><th>scommitid</th><th>bug-level</th><th>serucrity-level</th><th>short note</th>
 	</tr>
 	<tal:block repeat="row records">
 	  <tr>
 	  <td><div tal:content="row.commitdate"/></td>
-	  <td><a href="${detail}?commitid=${row.commitid}&branch=${check}"><div tal:content="row.commitid"/></a></td>
-	  <td><div tal:content="row.scommitid"/></td>
+	  <form action="${detail}" method="post">
+	    <input type="hidden" name="branch" value="${check}"/>
+	    <input type="hidden" name="commitid" value="${row.commitid}"/>
+	    <td><input type="submit" value="${row.scommitid}"/></td>
+	  </form>
+	  <td><div tal:content="row.buglevel"/></td>
 	  <td><div tal:content="row.seclevel"/></td>
 	  <td><div tal:content="row.snote"/></td>
 	  </tr>

@@ -8,7 +8,7 @@
     <meta name="author" content="Pylons Project">
     <link rel="shortcut icon" href="${request.static_url('pgmaster:static/pyramid-16x16.png')}">
 
-    <title>Pyramid Test Page</title>
+    <title>PostgreSQL CommitLog Show & Edit Page</title>
 
     <!-- Bootstrap core CSS -->
     <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
@@ -36,22 +36,64 @@
       <pre>${detail}</pre>
     </div>
 
-    <div>
-      <form action="${myself}" method="post">
-	<input type="hidden" name="commitid" value="${commitid}"><br/>
-	<input type="hidden" name="branch" value="${branch}"><br/>
-	LASTUPDATE: ${record.updatetime}<br/><br/>
-	revision       <textarea name="revision" tal:content="record.revision" rows="1" cols="10"><br/>
-	bug-level      <textarea name="buglevel" tal:content="record.buglevel" rows="1" cols="20"><br/> 
-	security-level <textarea name="seclevel" tal:content="record.seclevel" rows="1" cols="10"><br/>
-	short note     <textarea name="snote" tal:content="record.snote" rows="1" cols="100"/><br/>
-	long note      <textarea name="note" tal:content="record.note" rows="10" cols="100"/><br/>
-	url            <textarea name="releurl" tal:content="record.releurl" rows="1" cols="100"/><br/>
-        analysys       <textarea name="analysys" tal:content="record.analysys" rows="10" cols="100"/><br/>
-	genre          <textarea name="genre" tal:content="record.genre" rows="3" cols="30"/><br/>
-	<input type="submit" name="upload" value="Save"/>
+      <form action="${myself}" class="form-horizontal" role="form" method="post">
+	<fieldset>
+	  <input type="hidden" name="commitid" value="${commitid}"><br/>
+	  <input type="hidden" name="branch" value="${branch}"><br/>
+	  LASTUPDATE: ${record.updatetime}<br/><br/>
+	  <div class="form-group">
+	    <label class="col-sm-2 control-label">revision</label>
+	    <div class="col-xs-2">
+	      <input type="text"  class="form-control" name="revision" tal:content="record.revision"/>
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <label class="col-sm-2 control-label">bug-level</label>
+	    <div class="col-xs-3">
+	      <input type="text" class="form-control" name="buglevel" tal:content="record.buglevel"/>
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <label class="col-sm-2 control-label">security-level</label>
+	    <div class="col-xs-1">
+	      <input type="text"  class="form-control" name="seclevel" tal:content="record.seclevel"/>
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <label class="col-sm-2 control-label">short note</label>
+	    <div class="col-sm-8">
+	      <input type="text" class="form-control"  name="snote" tal:content="record.snote"/>
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <label class="col-sm-2 control-label" for="textarea">long note</label>
+	    <div class="col-sm-8">
+	      <textarea name="note" class="form-control" tal:content="record.note" rows="10"/>
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <label class="col-sm-2 control-label">url</label>
+            <div class="col-xs-8">
+	      <input type="text" name="releurl" class="form-control" tal:content="record.releurl"/>
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <label class="col-sm-2 control-label">analysys</label>
+	    <div class="col-sm-8">
+	      <textarea name="analysys" class="form-control" tal:content="record.analysys" rows="10"/>
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <label class="col-sm-2 control-label">genre</label>
+            <div class="col-xs-4">
+	      <input type="text" name="genre" class="form-control" tal:content="record.genre"/>
+	    </div>
+	    <div class="form-actions">
+	      <input type="submit" class="btn btn-primary" name="upload" value="Save"/>
+	    </div>
+	  </div>
+	</fieldset>
       </form>
-    </div>
 
 
     <div>
