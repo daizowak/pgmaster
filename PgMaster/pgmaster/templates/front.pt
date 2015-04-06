@@ -46,6 +46,7 @@
 	<input type="hidden" name="branch" value="${check}"/>
 	<input type="date" name="date" value=""/>
 	<input type="submit" value="change"/>
+      </form>
     </div>
     <div>
       <table class="table">
