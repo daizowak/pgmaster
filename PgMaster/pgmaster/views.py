@@ -62,6 +62,7 @@ def detail(request):
         note=request.params['note']
         revision=request.params['revision']
         releurl=request.params['releurl']
+        repourl=request.params['repourl']
         genre=request.params['genre']
         analysys=request.params['analysys']
         
@@ -74,6 +75,7 @@ def detail(request):
              "note":note,
              "revision":revision,
              "releurl":releurl,
+             "reporturl":repourl,
              "genre":genre,
              "analysys":analysys,
              })
@@ -85,7 +87,7 @@ def detail(request):
     except DBAPIError:
         return Response(conn_err_msg,content_type='text/plain',status_init=500)
     
-    return dict(myself=request.route_url('detail'),detail=description.decode('utf-8'),diff=diff,record=record,commitid=commitid,branch=check)
+    return dict(myself=request.route_url('detail'),top=request.route_url('front'),detail=description.decode('utf-8'),diff=diff,record=record,commitid=commitid,branch=check)
 
 
 @view_config(route_name='log',renderer='templates/log.pt')
