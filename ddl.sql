@@ -32,5 +32,7 @@ create table if not exists RELATEDCOMMIT
 (
 src_commitid text
 ,dst_commitid text
+,dst_relname text
+,primary key(src_commitid, dst_commitid)
 );
 

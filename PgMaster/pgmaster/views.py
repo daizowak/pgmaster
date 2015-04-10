@@ -15,6 +15,7 @@ from sqlalchemy.exc import DBAPIError
 from .models import (
     Base,
     DBSession,
+    RelatedCommit,
     )
 
 @view_config(route_name='home', renderer='templates/mytemplate.pt')
@@ -81,13 +82,23 @@ def detail(request):
              })
         DBSession.flush()
 
+    if 'relatedid' in request.params:
+        for  subrelated in DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all():
+            DBSession.add(RelatedCommit(subrelated.dst_commitid,request.params['relatedid'],request.params['relatedrel']))
+            DBSession.add(RelatedCommit(request.params['relatedid'],subrelated.dst_commitid,subrelated.dst_relname))
+        DBSession.add(RelatedCommit(commitid,request.params['relatedid'],request.params['relatedrel']))
+        DBSession.add(RelatedCommit(request.params['relatedid'],commitid,check))
+        DBSession.flush()
+
     try:
         # Search commit information.
-        record= DBSession.query(ormtype).filter(ormtype.commitid == commitid).one()
+        record = DBSession.query(ormtype).filter(ormtype.commitid == commitid).one()
+        # Search related information.
+        relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all()
     except DBAPIError:
         return Response(conn_err_msg,content_type='text/plain',status_init=500)
     
-    return dict(myself=request.route_url('detail'),top=request.route_url('front'),detail=description.decode('utf-8'),diff=diff,record=record,commitid=commitid,branch=check)
+    return dict(myself=request.route_url('detail'),top=request.route_url('front'),detail=description.decode('utf-8'),diff=diff,record=record,commitid=commitid,branch=check,relatedids=relatedids)
 
 
 @view_config(route_name='log',renderer='templates/log.pt')

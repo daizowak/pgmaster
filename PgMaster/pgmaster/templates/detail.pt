@@ -31,7 +31,25 @@
 	</div>
       </div>
     </div>
-
+    <div>
+	<tal:block repeat="record relatedids">
+	  <div><a href="${myself}?commitid=${record.dst_commitid}&branch=${record.dst_relname}">${record.dst_commitid}</a></div>
+	</tal:block>
+    </div>
+    <form action="${myself}"  method="get">
+	<input type="hidden" name="commitid" value="${commitid}">
+	<input type="hidden" name="branch" value="${branch}">
+	<input type="text" name="relatedid" value="" size="40" maxlength="40" placeholder="ここに関連コミットID(40文字)を入力">
+	<select name="relatedrel">
+	  <option value="REL8_4_STABLE">8.4</option>
+	  <option value="REL9_0_STABLE">9.0</option>
+	  <option value="REL9_1_STABLE">9.1</option>
+	  <option value="REL9_2_STABLE">9.2</option>
+	  <option value="REL9_3_STABLE">9.3</option>
+	  <option value="REL9_4_STABLE">9.4</option>
+	</select>
+	<input type="submit" name="insert" value="関連コミットを登録">
+    </form>
     <div>
       <pre>${detail}</pre>
     </div>
