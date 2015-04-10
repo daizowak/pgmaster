@@ -133,7 +133,7 @@
 		<option value="エンジン">エンジン</option>
 		<option value="API">API</option>
 		<option value="レプリケーション">レプリケーション</option>
-		<option value="コマンド">ツール</option>
+		<option value="コマンド">コマンド</option>
 		<option value="コメント">コメント</option>
 		<option value="contrib">contrib</option>
 		<option value="テスト">テスト</option>
