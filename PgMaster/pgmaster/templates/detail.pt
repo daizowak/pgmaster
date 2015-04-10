@@ -142,7 +142,8 @@
 	      </select>
 	    </div>
 	    <div class="form-actions">
-	      <input type="submit" class="btn btn-primary" name="upload" value="Save"/>
+	      <input type="submit" class="btn btn-primary" name="upload" value="更新"/>
+	      <input type="submit" class="btn btn-info" name="conupload" value="関連コミットにも反映"/>
 	    </div>
 	  </div>
 	</fieldset>

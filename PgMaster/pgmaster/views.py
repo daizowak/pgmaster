@@ -55,7 +55,7 @@ def detail(request):
     tblname=str(check).lower()
     ormtype=type(tblname,(Base,),{'__tablename__':tblname,'__table_args__':{'autoload':True}})
 
-    if 'upload' in request.params:
+    if 'upload' in request.params or 'conupload' in request.params:
 
         buglevel=request.params['buglevel']
         seclevel=request.params['seclevel']
@@ -81,6 +81,27 @@ def detail(request):
              "analysys":analysys,
              })
         DBSession.flush()
+
+
+        if 'conupload' in request.params:
+            # Search related information
+            relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all()
+            for id in relatedids:
+                dstrel=str(id.dst_relname).lower()
+                dstreltype=type(dstrel,(Base,),{'__tablename__':dstrel,'__table_args__':{'autoload':True}})
+                # UPDATE
+                DBSession.query(dstreltype).filter(dstreltype.commitid == id.dst_commitid).update(
+                    {"buglevel":buglevel,
+                     "seclevel":seclevel,
+                     "snote":snote,
+                     "note":note,
+                     "revision":revision,
+                     "releurl":releurl,
+                     "reporturl":repourl,
+                     "genre":genre,
+                     "analysys":analysys,
+                 })
+                DBSession.flush()                
 
     if 'relatedid' in request.params:
         for  subrelated in DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all():
