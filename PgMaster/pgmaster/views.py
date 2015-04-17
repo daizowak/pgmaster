@@ -27,7 +27,7 @@ def my_view(request):
 @view_config(route_name='front',renderer='templates/front.pt')
 def front(request):
     os.chdir("../master")
-    check = "REL9_2_STABLE" #default branch
+    check = "REL9_4_STABLE" #default branch
     if 'branch' in request.params:
         check = request.params['branch']
 
