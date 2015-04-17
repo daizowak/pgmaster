@@ -96,37 +96,37 @@
 	    </div>
 	  </div>
 	  <div class="form-group">
-	    <label class="col-sm-2 control-label">short note</label>
+	    <label class="col-sm-2 control-label">概要</label>
 	    <div class="col-sm-8">
 	      <input type="text" class="form-control"  name="snote" value="${record.snote}"/>
 	    </div>
 	  </div>
 	  <div class="form-group">
-	    <label class="col-sm-2 control-label" for="textarea">long note</label>
+	    <label class="col-sm-2 control-label" for="textarea">ノート</label>
 	    <div class="col-sm-8">
 	      <textarea name="note" class="form-control" tal:content="record.note" rows="10"/>
 	    </div>
 	  </div>
 	  <div class="form-group">
-	    <label class="col-sm-2 control-label">url</label>
+	    <label class="col-sm-2 control-label">リリースメモURL</label>
             <div class="col-xs-8">
 	      <input type="text" name="releurl" class="form-control" value="${record.releurl}"/>
 	    </div>
 	  </div>
 	  <div class="form-group">
-	    <label class="col-sm-2 control-label">report-url</label>
+	    <label class="col-sm-2 control-label">報告URL</label>
             <div class="col-sm-8">
 	      <input type="text" name="repourl" class="form-control" value="${record.reporturl}"/>
 	    </div>
 	  </div>
 	  <div class="form-group">
-	    <label class="col-sm-2 control-label">analysys</label>
+	    <label class="col-sm-2 control-label">分析メモ</label>
 	    <div class="col-sm-8">
 	      <textarea name="analysys" class="form-control" tal:content="record.analysys" rows="10"/>
 	    </div>
 	  </div>
 	  <div class="form-group">
-	    <label class="col-sm-2 control-label" for="select02">genre</label>
+	    <label class="col-sm-2 control-label" for="select02">コンポーネント</label>
 	    <div class="col-xs-4 controls">
 	      <select id="select02" name="genre">
 		<option value="${record.seclevel}">${record.genre}</option>

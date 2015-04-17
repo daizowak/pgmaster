@@ -51,7 +51,7 @@
     <div>
       <table class="table">
 	<tr>
-	<th>commitdate</th><th>scommitid</th><th>bug-level</th><th>serucrity-level</th><th>short note</th>
+	<th>コミット日</th><th>短縮コミットID</th><th>重要度</th><th>セキュリティレベル</th><th>概要</th>
 	</tr>
 	<tal:block repeat="row records">
 	  <tr>
