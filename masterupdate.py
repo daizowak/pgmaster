@@ -4,11 +4,17 @@ import os
 import commands
 import psycopg2
 import datetime
+import fcntl
 
 connstr = "dbname=pgmaster host=localhost user=postgres port=9999"
 
 # mv postgres git repository.
 os.chdir('master')
+
+# open a lock file.
+fd = open("HISTORY","r")
+fcntl.flock(fd,fcntl.LOCK_EX)  #LOCK!
+
 versions=commands.getoutput("git branch|cut -c3-|grep ^REL").split('\n') 
 for version in versions:
     commands.getoutput("git checkout " + version)
@@ -49,5 +55,8 @@ for version in versions:
             cur.close() 
     print "done."
 
-
+fcntl.flock(fd,fcntl.LOCK_UN)  #UNLOCK!
+fd.close()
 print "all have done."
+
+

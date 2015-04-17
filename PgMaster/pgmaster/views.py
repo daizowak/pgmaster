@@ -10,6 +10,8 @@ import commands
 # import psycopg2
 import datetime
 # import custom model
+import time
+import fcntl
 
 from sqlalchemy.exc import DBAPIError
 from .models import (
@@ -28,7 +30,6 @@ def front(request):
     check = "REL9_2_STABLE" #default branch
     if 'branch' in request.params:
         check = request.params['branch']
-    commands.getoutput("git checkout " + check)
 
     # Select commit database limit 50
     tblname=str(check).lower()
@@ -37,7 +38,7 @@ def front(request):
         records=DBSession.query(ormtype).filter(ormtype.commitdate<=request.params['date']).order_by(ormtype.commitdate.desc(),ormtype.logid).limit(50).all()
     else:
         records= DBSession.query(ormtype).order_by(ormtype.commitdate.desc(),ormtype.logid).limit(50).all()
-
+        
     return dict(myself=request.route_url('front'),check=check,records=records,detail=request.route_url('detail'))
 
 
@@ -47,11 +48,18 @@ def detail(request):
     check = "REL9_2_STABLE"
     if 'branch' in request.params:
         check = request.params['branch']
-    commands.getoutput("git checkout " + check)
 
     commitid=request.params['commitid']
+    # open a lock file.
+    fd = open("HISTORY","r")
+    fcntl.flock(fd,fcntl.LOCK_EX)  #LOCK!
+
+    commands.getoutput("git checkout " + check)
     description=commands.getoutput("git log --stat -1 " + commitid )
     diff=commands.getoutput("git log -p -1 --pretty=format: " + commitid )
+
+    fcntl.flock(fd,fcntl.LOCK_UN)  #UNLOCK!
+    fd.close()
     tblname=str(check).lower()
     ormtype=type(tblname,(Base,),{'__tablename__':tblname,'__table_args__':{'autoload':True}})
 
@@ -117,8 +125,7 @@ def detail(request):
         # Search related information.
         relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all()
     except DBAPIError:
-        return Response(conn_err_msg,content_type='text/plain',status_init=500)
-    
+        return Response(conn_err_msg,content_type='text/plain',status_init=500)    
     return dict(myself=request.route_url('detail'),top=request.route_url('front'),detail=description.decode('utf-8'),diff=diff,record=record,commitid=commitid,branch=check,relatedids=relatedids)
 
 
@@ -128,14 +135,20 @@ def log(request):
     check = "REL9_2_STABLE"
     if 'branch' in request.params:
         check = request.params['branch']
-    commands.getoutput("git checkout " + check)
 
     # Keyword Search
     word="Stamp"
     if 'keyword' in request.params:
         word = request.params['keyword']
 
+    # open a lock file.
+    fd = open("HISTORY","r")
+    fcntl.flock(fd,fcntl.LOCK_EX)  #LOCK!
+    commands.getoutput("git checkout " + check)
     result=commands.getoutput("git log --grep=\"" + word  + "\"")
+    fcntl.flock(fd,fcntl.LOCK_UN)  #UNLOCK!
+    fd.close()
+
     return dict(test=result.decode('utf-8'),myself=request.route_url('log'),check=check)
 
 
