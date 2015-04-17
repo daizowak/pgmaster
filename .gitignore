@@ -11,6 +11,7 @@
 *.a
 *.mo
 *.bak
+lockfile
 nohup.out
 objfiles.txt
 .deps/

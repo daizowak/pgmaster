@@ -51,7 +51,7 @@ def detail(request):
 
     commitid=request.params['commitid']
     # open a lock file.
-    fd = open("HISTORY","r")
+    fd = open("../lockfile","w")
     fcntl.flock(fd,fcntl.LOCK_EX)  #LOCK!
 
     commands.getoutput("git checkout " + check)
@@ -142,7 +142,7 @@ def log(request):
         word = request.params['keyword']
 
     # open a lock file.
-    fd = open("HISTORY","r")
+    fd = open("../lockfile","w")
     fcntl.flock(fd,fcntl.LOCK_EX)  #LOCK!
     commands.getoutput("git checkout " + check)
     result=commands.getoutput("git log --grep=\"" + word  + "\"")

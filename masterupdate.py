@@ -12,7 +12,7 @@ connstr = "dbname=pgmaster host=localhost user=postgres port=9999"
 os.chdir('master')
 
 # open a lock file.
-fd = open("HISTORY","r")
+fd = open("../lockfile","w")
 fcntl.flock(fd,fcntl.LOCK_EX)  #LOCK!
 
 versions=commands.getoutput("git branch|cut -c3-|grep ^REL").split('\n') 
