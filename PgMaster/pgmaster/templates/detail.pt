@@ -137,6 +137,7 @@
 		<option value="コメント">コメント</option>
 		<option value="contrib">contrib</option>
 		<option value="テスト">テスト</option>
+		<option value="ドキュメント">ドキュメント</option>
 		<option value="N/A">N/A</option>
 		<option value=""/>
 	      </select>
