@@ -16,6 +16,7 @@ nohup.out
 objfiles.txt
 .deps/
 master/
+bak/
 
 # Untracked files of Pgmaster.
 PgMaster/.eggs/

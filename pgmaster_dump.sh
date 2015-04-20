@@ -34,7 +34,7 @@ then
 fi
 
 echo -n "INFO: dump is working..."
-mes=`pg_dump -Fc -f ${filename} 2>&1`
+mes=`pg_dump -Fc -f bak/${filename} 2>&1`
 if [ $? -eq 0 ];
 then
     echo "OK"
@@ -46,6 +46,6 @@ fi
 
 echo "LOG: dump has completed."
 echo "LOG: filename: ${filename}"
-echo "LOG: `ls -l ${filename}`"
+echo "LOG: `ls -l bak/${filename}`"
 
 exit 0
