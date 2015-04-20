@@ -19,15 +19,15 @@ versions=commands.getoutput("git branch|cut -c3-|grep ^REL").split('\n')
 for version in versions:
     commands.getoutput("git checkout " + version)
     commands.getoutput("git pull")
-    print "git pull done. branch :" + version 
+    print "LOG: git pull done. branch :" + version 
 
 # connect
 conn = psycopg2.connect(connstr)
-print "connect"
+print "LOG: connect"
 
 # main process
 for version in versions:
-    print "processing...." + version
+    print "LOG: processing...." + version
     commands.getoutput("git checkout " + version)
     cur = conn.cursor()
     cur.execute("select max(commitdate) from " + version + " limit 1")
@@ -48,15 +48,13 @@ for version in versions:
                 cur.execute("insert into " + version + " (commitid,scommitid,commitdate) values ( %s,%s,%s) ",(commitid,scommitid,commitdate))
                 print commitid + " has inserted."
             except psycopg2.Error as e:
-                print "ERRCODE:" + e.pgcode + " MESSAGE:" + e.pgerror
-                print "info: we will skip the record because it exists already. let's go next one."
+                print "LOG:" + e.pgerror + "errorcode:"
+                print "INFO: we will skip the record because it exists already. let's read next one."
                 pass
             conn.commit()
             cur.close() 
-    print "done."
+    print "INFO: done."
 
 fcntl.flock(fd,fcntl.LOCK_UN)  #UNLOCK!
 fd.close()
-print "all have done."
-
-
+print "LOG: all have done."
