@@ -20,6 +20,7 @@ from .models import (
     RelatedCommit,
     )
 
+
 @view_config(route_name='home', renderer='templates/mytemplate.pt')
 def my_view(request):
     return HTTPFound(location = request.route_url('front',pagename='front'))
@@ -126,7 +127,7 @@ def detail(request):
         relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all()
     except DBAPIError:
         return Response(conn_err_msg,content_type='text/plain',status_init=500)    
-    return dict(myself=request.route_url('detail'),top=request.route_url('front'),detail=description.decode('utf-8'),diff=diff,record=record,commitid=commitid,branch=check,relatedids=relatedids)
+    return dict(myself=request.route_url('detail'),top=request.route_url('front'),detail=unicode(description,'utf-8','ignore'),diff=unicode(diff,'utf-8','ignore'),record=record,commitid=commitid,branch=check,relatedids=relatedids)
 
 
 @view_config(route_name='log',renderer='templates/log.pt')
