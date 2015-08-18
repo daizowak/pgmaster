@@ -129,7 +129,7 @@
 	    <label class="col-sm-2 control-label" for="select02">コンポーネント</label>
 	    <div class="col-xs-4 controls">
 	      <select id="select02" name="genre">
-		<option value="${record.seclevel}">${record.genre}</option>
+		<option value="${record.genre}">${record.genre}</option>
 		<option value="エンジン">エンジン</option>
 		<option value="API">API</option>
 		<option value="レプリケーション">レプリケーション</option>
@@ -147,6 +147,7 @@
 	      <input type="submit" class="btn btn-info" name="conupload" value="関連コミットにも反映"/>
 	    </div>
 	  </div>
+	  
 	</fieldset>
       </form>
 
