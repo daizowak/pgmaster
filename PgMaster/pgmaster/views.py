@@ -19,6 +19,21 @@ from .models import (
     )
 
 
+# カスタム例外クラスの定義
+class CustomExceptionContext(Exception):
+    def __init__(self,msg):
+        self.msg = msg
+
+# カスタム例外ビューメソッドの定義
+"""
+CustomExceptionContext(message)がraiseされたらこのビューが
+自動的に表示される。このビューは、messageを表示するだけ。
+"""
+@view_config(context=CustomExceptionContext, renderer='templates/error.pt')
+def error(exception, request):
+    request.response.status_code = 500
+    return dict(exception=exception.msg)
+
 @view_config(route_name='home', renderer='templates/mytemplate.pt')
 def my_view(request):
     return HTTPFound(location = request.route_url('front',pagename='front'))
@@ -143,6 +158,18 @@ def detail(request):
 
     # 関連コミットを登録ボタンが押されたら、登録するコミットIDとバージョンを登録する
     if 'relatedid' in request.params:
+        # まずは入力されたバージョンテーブルに関連コミットがあるか検索
+        # なければ登録しない
+        tblname=str(request.params['relatedrel']).lower()
+        ormtype_tmp=type(tblname,(Base,),{'__tablename__':tblname,'__table_args__':{'autoload':True}})
+        # 該当するコミットレコードが本当にあるかチェック
+        try:
+            nrows = DBSession.query(ormtype_tmp).filter(ormtype_tmp.commitid == request.params['relatedid']).count()
+            if nrows == 0:
+                raise CustomExceptionContext('Your input commitid does not exist in specified PG-version.')
+        except DBAPIError:
+            raise CustomExceptionContext('Internal Error...')
+        
         for  subrelated in DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all():
             DBSession.add(RelatedCommit(subrelated.dst_commitid,request.params['relatedid'],request.params['relatedrel']))
             DBSession.add(RelatedCommit(request.params['relatedid'],subrelated.dst_commitid,subrelated.dst_relname))
@@ -160,7 +187,7 @@ def detail(request):
         # Search related information.
         relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all()
     except DBAPIError:
-        return Response(conn_err_msg,content_type='text/plain',status_init=500)    
+        raise CustomExceptionContext('Internal Error...(Failed search of specified commitid information)')
     return dict(myself=request.route_url('detail'),top=request.route_url('front'),detail=unicode(description,'utf-8','ignore'),diff=unicode(diff,'utf-8','ignore'),record=record,commitid=commitid,branch=check,relatedids=relatedids)
 
 # git検索用ページ(コミットリポジトリとは独立して存在)
@@ -193,6 +220,3 @@ def log(request):
     fd.close()
 
     return dict(test=result.decode('utf-8'),myself=request.route_url('log'),check=check)
-
-
-conn_err_msg="SQLAlchemy error occured..."
