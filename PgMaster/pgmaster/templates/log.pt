@@ -40,7 +40,7 @@
 	<input type="submit" name="branch" value="REL9_1_STABLE"/>
 	<input type="submit" name="branch" value="REL9_0_STABLE"/>
 	<input type="submit" name="branch" value="REL8_4_STABLE"/>
-	Keyword=<input type="text"   name="keyword" size="30" maxlength="20"/>
+	Keyword=<input type="text"   name="keyword" size="80" maxlength="70"/>
       </form>
     </div>
     <div>
