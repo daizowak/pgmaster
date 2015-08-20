@@ -12,10 +12,15 @@ PgMaster.egg-info/not-zip-safe
 PgMaster.egg-info/requires.txt
 PgMaster.egg-info/top_level.txt
 pgmaster/__init__.py
+pgmaster/models.py
 pgmaster/tests.py
 pgmaster/views.py
 pgmaster/static/pyramid-16x16.png
 pgmaster/static/pyramid.png
 pgmaster/static/theme.css
 pgmaster/static/theme.min.css
+pgmaster/templates/detail.pt
+pgmaster/templates/error.pt
+pgmaster/templates/front.pt
+pgmaster/templates/log.pt
 pgmaster/templates/mytemplate.pt
