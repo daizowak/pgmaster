@@ -63,11 +63,13 @@
 	<tal:block repeat="row records">
 	  <tr>
 	  <td><div tal:content="row.commitdate"/></td>
-	  <form action="${detail}" method="post">
-	    <input type="hidden" name="branch" value="${check}"/>
-	    <input type="hidden" name="commitid" value="${row.commitid}"/>
-	    <td><input type="submit" value="${row.scommitid}"/></td>
-	  </form>
+	  <td>
+	    <form action="${detail}" method="post">
+	      <input type="hidden" name="branch" value="${check}"/>
+	      <input type="hidden" name="commitid" value="${row.commitid}"/>
+	      <input type="submit" value="${row.scommitid}"/>
+	    </form>
+	  </td>
 	  <td><div tal:content="row.buglevel"/></td>
 	  <td><div tal:content="row.seclevel"/></td>
 	  <td><div tal:content="row.snote"/></td>
