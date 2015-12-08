@@ -140,10 +140,11 @@ def detail(request):
 
 
         # 関連コミットにも反映ボタンが押された場合は、関連コミットとして登録されているコミットIDにも
-        # 同様の情報を更新する。
+        # 同様の情報を更新する。ただし、同じバージョンのコミットIDレコードは更新対象外とする。
+        # (この機能はあくまでバックパッチ目的)
         if 'conupload' in request.params:
             # Search related information
-            relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all()
+            relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).filter(RelatedCommit.dst_relname != str(check)).all()
             for id in relatedids:
                 dstrel=str(id.dst_relname).lower()
                 dstreltype=type(dstrel,(Base,),{'__tablename__':dstrel,'__table_args__':{'autoload':True}})
