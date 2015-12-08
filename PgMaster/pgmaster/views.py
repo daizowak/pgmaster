@@ -176,9 +176,16 @@ def detail(request):
         except DBAPIError:
             raise CustomExceptionContext('Internal Error...')
         
+        # 今回追加する関連コミット情報と、既に存在する関連コミットとの関連付けを行う。
+        # ただし、追加する関連コミットが同じバージョンだったら、
+        # すでに存在する異なるバージョンとの関連コミットとの関連付けを行わない
+        # (同じバージョンとの関連付けは行う)
         for  subrelated in DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all():
+            if str(check) == request.params['relatedrel'] and subrelated.dst_relname != request.params['relatedrel']:
+                continue 
             DBSession.add(RelatedCommit(subrelated.dst_commitid,request.params['relatedid'],request.params['relatedrel']))
             DBSession.add(RelatedCommit(request.params['relatedid'],subrelated.dst_commitid,subrelated.dst_relname))
+        # 今回登録する関連コミットと当該ページのコミット情報の関連付けを行う。
         DBSession.add(RelatedCommit(commitid,request.params['relatedid'],request.params['relatedrel']))
         DBSession.add(RelatedCommit(request.params['relatedid'],commitid,check))
         DBSession.flush()
