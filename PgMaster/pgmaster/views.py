@@ -98,15 +98,15 @@ def detail(request):
 
     commitid=request.params['commitid']
     # open a lock file.
-    fd = open("../lockfile","w")
-    fcntl.flock(fd,fcntl.LOCK_EX)  #LOCK!
-
-    commands.getoutput("git checkout " + check)
-    description=commands.getoutput("git log --stat -1 " + commitid )
-    diff=commands.getoutput("git log -p -1 --pretty=format: " + commitid )
-
-    fcntl.flock(fd,fcntl.LOCK_UN)  #UNLOCK!
-    fd.close()
+    try:
+        fd = open("../lockfile","w")
+        fcntl.flock(fd,fcntl.LOCK_EX)  #LOCK!
+        commands.getoutput("git checkout " + check)
+        description=commands.getoutput("git log --stat -1 " + commitid )
+        diff=commands.getoutput("git log -p -1 --pretty=format: " + commitid )
+    finally:
+        fcntl.flock(fd,fcntl.LOCK_UN)  #UNLOCK!
+        fd.close()
     tblname=str(check).lower()
     ormtype=type(tblname,(Base,),{'__tablename__':tblname,'__table_args__':{'autoload':True}})
 
@@ -225,11 +225,14 @@ def log(request):
     # open a lock file.
     # こちらも同じgitリポジトリを使用するので、
     # ロックファイルを使用した排他制御が必要。
-    fd = open("../lockfile","w")
-    fcntl.flock(fd,fcntl.LOCK_EX)  #LOCK!
-    commands.getoutput("git checkout " + check)
-    result=commands.getoutput("git log --grep=\"" + word  + "\"")
-    fcntl.flock(fd,fcntl.LOCK_UN)  #UNLOCK!
-    fd.close()
+    # ファイルディスクリプタのクローズはfinallyブロックで行う。
+    try:
+        fd = open("../lockfile","w")
+        fcntl.flock(fd,fcntl.LOCK_EX)  #LOCK!
+        commands.getoutput("git checkout " + check)
+        result=commands.getoutput("git log --grep=\"" + word.encode('utf-8')  + "\"")
+    finally:
+        fcntl.flock(fd,fcntl.LOCK_UN)  #UNLOCK!
+        fd.close()
 
-    return dict(test=result.decode('utf-8'),myself=request.route_url('log'),check=check)
+    return dict(test=unicode(result,'utf-8','ignore'),myself=request.route_url('log'),check=check)
