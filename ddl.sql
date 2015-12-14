@@ -6,7 +6,7 @@ create table if not exists _version
 logid bigserial primary key  -- テーブル毎にユニークなプライマリキー
 ,commitid text unique         -- commitid (from git log)
 ,scommitid text unique          -- (short)commitid ( from git log)
-,commitdate date              -- commitdate (from git log)
+,commitdate timestamptz              -- commitdate (from git log)
 ,updatetime timestamp default now() -- 情報を更新した日付
 ,seclevel text  -- セキュリティレベル
 ,reporturl text -- バグ報告URL

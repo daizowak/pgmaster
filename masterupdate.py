@@ -30,12 +30,12 @@ for version in versions:
     print "LOG: processing...." + version
     commands.getoutput("git checkout " + version)
     cur = conn.cursor()
-    cur.execute("select max(commitdate) from " + version + " limit 1")
+    cur.execute("select (max(commitdate) - interval '1 days')::date from " + version + " limit 1")
     since=cur.fetchone()
     conn.commit()
     cur.close()
 
-    command="git log --date=short --no-merges --pretty=format:\"%H,%h,%ad\""
+    command="git log --date=short --no-merges --pretty=format:\"%H,%h,%ci\""
     if since is not None:
         command += " --since " + since[0].strftime('%Y-%m-%d')
         records=commands.getoutput(command).split('\n')

@@ -52,13 +52,13 @@
       <form action="${myself}" method="post">
 	<input type="hidden" name="branch" value="${check}"/>
 	<input type="number" min="0" step="50" name="offset" value=""/>
-	<input type="submit" value="ジャンプ"/>
+	<input type="submit" value="jump"/>
       </form>
     </div>
     <div>
       <table class="table">
 	<tr>
-	<th>コミット日</th><th>短縮コミットID</th><th>重要度</th><th>セキュリティレベル</th><th>概要</th>
+	<th>commitdate</th><th>commitid</th><th>level</th><th>security</th><th>summary</th>
 	</tr>
 	<tal:block repeat="row records">
 	  <tr>
