@@ -25,3 +25,10 @@ class RelatedCommit(Base):
         self.src_commitid=src
         self.dst_commitid=dst
         self.dst_relname=relname
+
+class BranchList(Base):
+    __tablename__='branchlist'
+    branch=Column('branch',Text,primary_key=True)
+
+    def __init__(self,branch):
+        self.branch=branch

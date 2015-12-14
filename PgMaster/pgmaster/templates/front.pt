@@ -33,26 +33,30 @@
     </div>
     <div>
       <form action="${myself}" method="post">
-	<input type="submit" name="branch" value="REL9_4_STABLE"/>
-	<input type="submit" name="branch" value="REL9_3_STABLE"/>
-	<input type="submit" name="branch" value="REL9_2_STABLE"/>
-	<input type="submit" name="branch" value="REL9_1_STABLE"/>
-	<input type="submit" name="branch" value="REL9_0_STABLE"/>
-	<input type="submit" name="branch" value="REL8_4_STABLE"/>
+	<tal:block repeat="row branchlist">
+	  <input type="submit" name="branch" value="${row.branch}"/>
+	</tal:block>
       </form>
     </div>
     <div>
-      <form action="${myself}" method="post">
-	<input type="hidden" name="branch" value="${check}"/>
-	<input type="date" name="date" value=""/>
-	<input type="submit" value="change"/>
-      </form>
+        <form action="${myself}" method="post">
+	    <input type="hidden" name="branch" value="${check}"/>
+	    <input type="date" name="date" value=""/>
+            <input type="submit" value="change"/>
+        </form>  
     </div>
     <div>
       <form action="${myself}" method="post">
 	<input type="hidden" name="branch" value="${check}"/>
 	<input type="number" min="0" step="50" name="offset" value=""/>
 	<input type="submit" value="jump"/>
+      </form>
+    </div>
+    <div>
+      <form action="${myself}" method="post">
+	<input type="hidden" name="branch" value="${check}"/>
+	<input type="text" name="commitid" value=""/>
+	<input type="submit" value="filter"/>
       </form>
     </div>
     <div>

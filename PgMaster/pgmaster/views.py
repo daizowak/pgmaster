@@ -16,6 +16,7 @@ from .models import (
     Base,
     DBSession,
     RelatedCommit,
+    BranchList,
     )
 
 
@@ -43,23 +44,34 @@ def my_view(request):
 frontページにアクセスするとこの処理が実行される。
 トップページはデータベースからデフォルトの50件を取得して表示する。
 もしパラメータに日付が指定されていたらその日付以前の50件のコミットを表示する。
-コミット情報はバージョン毎にテーブルを用意している↓
+コミット情報はバージョン毎に以下のテーブルを用意している↓
 rel8_4_stable
 rel9_0_stable
 rel9_1_stable
 rel9_2_stable
 rel9_3_stable
 rel9_4_stable
+# rel9_5_stable (comming soon!)
 ボタンを押したときに動的にそのテーブルが検索されるよう、
 SQLAlchemyのormtypeインスタンスは、押下したボタン(バージョン)に
 併せて対応するテーブルのインスタンスを都度作成することでこの処理を実現している。
 """
 @view_config(route_name='front',renderer='templates/front.pt')
 def front(request):
+
+    #データベースに定義されたブランチテーブル一覧(view:branchlist)を取得し、
+    #そのブランチリストをfrontページのタブとして表示させる
+    branchlist=DBSession.query(BranchList).all()
+
     os.chdir("../master")
     check = "REL9_4_STABLE" #default branch
     if 'branch' in request.params:
         check = request.params['branch']
+
+    #コミットIDフィルタ
+    commitid=""
+    if 'commitid' in request.params:
+        commitid = request.params['commitid']
 
     #defalt offset is 0
     offset_num=0
@@ -72,9 +84,9 @@ def front(request):
     if 'date' in request.params:
         records=DBSession.query(ormtype).filter(ormtype.commitdate<=request.params['date']).order_by(ormtype.commitdate.desc(),ormtype.logid).limit(50).offset(offset_num).all()
     else:
-        records= DBSession.query(ormtype).order_by(ormtype.commitdate.desc(),ormtype.logid).limit(50).offset(offset_num).all()
+        records= DBSession.query(ormtype).order_by(ormtype.commitdate.desc(),ormtype.logid).filter(ormtype.commitid.like(commitid + "%")).limit(50).offset(offset_num).all()
         
-    return dict(myself=request.route_url('front'),check=check,records=records,detail=request.route_url('detail'))
+    return dict(myself=request.route_url('front'),branchlist=branchlist,check=check,records=records,detail=request.route_url('detail'))
 
 # コミット情報詳細ページ
 """

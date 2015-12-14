@@ -27,6 +27,7 @@ create table if not exists REL9_1_STABLE(like _version including all) inherits(_
 create table if not exists REL9_2_STABLE(like _version including all) inherits(_version);
 create table if not exists REL9_3_STABLE(like _version including all) inherits(_version);
 create table if not exists REL9_4_STABLE(like _version including all) inherits(_version);
+create table if not exists REL9_5_STABLE(like _version including all) inherits(_version);
 
 create table if not exists RELATEDCOMMIT
 (
@@ -35,4 +36,13 @@ src_commitid text
 ,dst_relname text
 ,primary key(src_commitid, dst_commitid)
 );
+
+CREATE OR REPLACE VIEW branchlist AS 
+    SELECT upper(relname) AS branch 
+    FROM pg_class 
+    WHERE oid 
+    IN (
+        SELECT inhrelid FROM pg_inherits WHERE inhparent=(SELECT oid FROM pg_class WHERE relname='_version' limit 1)
+        ) 
+    ORDER BY relname DESC;
 
