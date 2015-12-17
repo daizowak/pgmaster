@@ -78,15 +78,19 @@ def front(request):
     #そのブランチリストをfrontページのタブとして表示させる
     branchlist=DBSession.query(BranchList).all()
 
-    os.chdir("../master")
-    check = "REL9_4_STABLE" #default branch
-    if 'branch' in request.params:
-        check = request.params['branch']
+    majorver = "9.4" #default branch
+    if 'majorver' in request.params:
+        majorver = request.params['majorver']
 
     #コミットIDフィルタ
     commitid=""
     if 'commitid' in request.params:
         commitid = request.params['commitid']
+
+    #all検索チェックがついていたら全バージョンからコミットを検索
+    isall="false"
+    if 'all' in request.params:
+        isall = request.params['all']
 
     #defalt offset is 0
     offset_num=0
@@ -94,13 +98,16 @@ def front(request):
         offset_num = request.params['offset']
 
     # Select commit database limit 50
-    majorver=check[3:].replace('_STABLE','').replace('_','.')
     if 'date' in request.params:
         records=DBSession.query(CommitTable).filter(CommitTable.majorver==majorver).filter(CommitTable.commitdate<=request.params['date']).order_by(CommitTable.commitdate.desc(),CommitTable.logid).limit(50).offset(offset_num).all()
+    
+    elif isall == "true":
+        records= DBSession.query(CommitTable).order_by(CommitTable.commitdate.desc(),CommitTable.logid).filter(CommitTable.commitid.like(commitid + "%")).limit(50).offset(offset_num).all()
     else:
         records= DBSession.query(CommitTable).order_by(CommitTable.commitdate.desc(),CommitTable.logid).filter(CommitTable.majorver==majorver).filter(CommitTable.commitid.like(commitid + "%")).limit(50).offset(offset_num).all()
-        
-    return dict(myself=request.route_url('front'),branchlist=branchlist,check=check,records=records,detail=request.route_url('detail'))
+
+    
+    return dict(myself=request.route_url('front'),branchlist=branchlist,majorver=majorver,records=records,detail=request.route_url('detail'))
 
 # コミット情報詳細ページ
 """
@@ -118,10 +125,12 @@ git checkout->git logは、ロックファイルを用いて
 @view_config(route_name='detail',renderer='templates/detail.pt')
 def detail(request):
     os.chdir("../master")
-    check = "REL9_2_STABLE"
-    if 'branch' in request.params:
-        check = request.params['branch']
+    majorver = "9.2"
+    if 'majorver' in request.params:
+        majorver = request.params['majorver']
 
+    # gitコマンド発行用
+    check = "REL" + majorver.replace('.','_') + "_STABLE" 
     commitid=request.params['commitid']
     # open a lock file.
     try:
@@ -133,8 +142,6 @@ def detail(request):
     finally:
         fcntl.flock(fd,fcntl.LOCK_UN)  #UNLOCK!
         fd.close()
-    tblname="_version"
-    majorver=check[3:].replace('_STABLE','').replace('_','.')
 
     # 更新ボタンが押された場合はこの処理が実行される
     if 'upload' in request.params or 'conupload' in request.params:
@@ -170,7 +177,7 @@ def detail(request):
         # (この機能はあくまでバックパッチ目的)
         if 'conupload' in request.params:
             # Search related information
-            relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).filter(RelatedCommit.dst_relname != str(check)).all()
+            relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).filter(RelatedCommit.dst_relname != majorver).all()
             for id in relatedids:
                 targetver=id.dst_relname[3:].replace('_STABLE','').replace('_','.')
                 # UPDATE
@@ -191,7 +198,7 @@ def detail(request):
     if 'relatedid' in request.params:
         # まずは入力されたバージョンテーブルに関連コミットがあるか検索
         # なければ登録しない
-        targetver=str(request.params['relatedrel'])[3:].replace('_STABLE','').replace('_','.')
+        targetver=str(request.params['relatedrel'])
         # 該当するコミットレコードが本当にあるかチェック
         try:
             nrows = DBSession.query(CommitTable).filter(CommitTable.majorver == targetver).filter(CommitTable.commitid == request.params['relatedid']).count()
@@ -204,13 +211,13 @@ def detail(request):
         # ただし、追加する関連コミットが同じバージョンだったら、
         # すでに存在する異なるバージョンとの関連コミットとの関連付けを行わない
         for  subrelated in DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all():
-            if str(check) == request.params['relatedrel']:
+            if majorver == request.params['relatedrel']:
                 continue 
             DBSession.add(RelatedCommit(subrelated.dst_commitid,request.params['relatedid'],request.params['relatedrel']))
             DBSession.add(RelatedCommit(request.params['relatedid'],subrelated.dst_commitid,subrelated.dst_relname))
         # 今回登録する関連コミットと当該ページのコミット情報の関連付けを行う。
         DBSession.add(RelatedCommit(commitid,request.params['relatedid'],request.params['relatedrel']))
-        DBSession.add(RelatedCommit(request.params['relatedid'],commitid,check))
+        DBSession.add(RelatedCommit(request.params['relatedid'],commitid,majorver))
         DBSession.flush()
 
     # 引数として渡されたコミット情報を検索する。
@@ -224,7 +231,7 @@ def detail(request):
         relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all()
     except DBAPIError:
         raise CustomExceptionContext('Internal Error...(Failed search of specified commitid information)')
-    return dict(myself=request.route_url('detail'),top=request.route_url('front'),detail=unicode(description,'utf-8','ignore'),diff=unicode(diff,'utf-8','ignore'),record=record,commitid=commitid,branch=check,relatedids=relatedids)
+    return dict(myself=request.route_url('detail'),top=request.route_url('front'),detail=unicode(description,'utf-8','ignore'),diff=unicode(diff,'utf-8','ignore'),record=record,commitid=commitid,majorver=majorver,relatedids=relatedids)
 
 # git検索用ページ(コミットリポジトリとは独立して存在)
 """
