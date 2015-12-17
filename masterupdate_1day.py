@@ -38,6 +38,11 @@ for version in versions:
     command="git log --date=short --no-merges --pretty=format:\"%H,%h,%ci\""
     if since is not None:
         majorver=version[3:].replace('_STABLE','').replace('_','.')  #メジャーバージョンの取得
+        ##### 9.5対応が完了するまでこのチェックは削除厳禁
+        if majorver=='9.5':
+            print "INFO: 9.5 branch is not ready yet."
+            continue
+        ##### 
         command += " --since \"" + since + "\" --until `date -d \"" + since + " 1 day\" +%Y-%m-%d`"
         records=commands.getoutput(command).split('\n')
         if records[0] == '':
@@ -49,7 +54,8 @@ for version in versions:
             commitdate= record.split(',')[2]
             cur = conn.cursor()
             try:
-                cur.execute("insert into " + version + " (commitid,scommitid,commitdate,majorver) values ( %s,%s,%s,%s) ",(commitid,scommitid,commitdate,majorver))
+                #パーティショントリガによりそれぞれのテーブルに振り分けられる
+                cur.execute("insert into _version (commitid,scommitid,commitdate,majorver) values ( %s,%s,%s,%s) ",(commitid,scommitid,commitdate,majorver))
                 print commitid + " has inserted."
             except psycopg2.Error as e:
                 print "LOG:" + e.pgerror + "errorcode:"

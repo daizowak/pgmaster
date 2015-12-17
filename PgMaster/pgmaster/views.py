@@ -17,6 +17,7 @@ from .models import (
     DBSession,
     RelatedCommit,
     BranchList,
+    CommitTable,
     )
 
 
@@ -52,9 +53,23 @@ rel9_2_stable
 rel9_3_stable
 rel9_4_stable
 # rel9_5_stable (comming soon!)
-ボタンを押したときに動的にそのテーブルが検索されるよう、
-SQLAlchemyのormtypeインスタンスは、押下したボタン(バージョン)に
-併せて対応するテーブルのインスタンスを都度作成することでこの処理を実現している。
+上記テーブルは全て_versionテーブルを親とした
+パーティションテーブル構成になっている。
+そのため、_versionテーブルに対してINSERT/UPDATE/DELETE/SELECTを
+行うことで、各テーブルに対して処理が透過的に実施される。
+
+**********************************************
+以前までの実装ではボタンを押したときに動的にそのテーブルが検索されるよう、
+押下したボタン(バージョン)に併せて対応するテーブルの
+カスタムタイプインスタンスを都度作成することでこの処理を実現していた。
+もうこの実現方法は必要ないのだが、メモとしてormtypeインスタンスの作成方法を
+ここに残しておくことにする。
+
+#ormtype=type("作成したいテーブル名",(Base,),{'__tablename__':"作成したいテーブル名",'__table_args__':{'autoload':True}})
+
+こうすることによって、動的に作成したいテーブルのSQLAlchemyインスタンスタイプを作成できる。
+**********************************************
+
 """
 @view_config(route_name='front',renderer='templates/front.pt')
 def front(request):
@@ -79,12 +94,11 @@ def front(request):
         offset_num = request.params['offset']
 
     # Select commit database limit 50
-    tblname=str(check).lower()
-    ormtype=type(tblname,(Base,),{'__tablename__':tblname,'__table_args__':{'autoload':True}})
+    majorver=check[3:].replace('_STABLE','').replace('_','.')
     if 'date' in request.params:
-        records=DBSession.query(ormtype).filter(ormtype.commitdate<=request.params['date']).order_by(ormtype.commitdate.desc(),ormtype.logid).limit(50).offset(offset_num).all()
+        records=DBSession.query(CommitTable).filter(CommitTable.majorver==majorver).filter(CommitTable.commitdate<=request.params['date']).order_by(CommitTable.commitdate.desc(),CommitTable.logid).limit(50).offset(offset_num).all()
     else:
-        records= DBSession.query(ormtype).order_by(ormtype.commitdate.desc(),ormtype.logid).filter(ormtype.commitid.like(commitid + "%")).limit(50).offset(offset_num).all()
+        records= DBSession.query(CommitTable).order_by(CommitTable.commitdate.desc(),CommitTable.logid).filter(CommitTable.majorver==majorver).filter(CommitTable.commitid.like(commitid + "%")).limit(50).offset(offset_num).all()
         
     return dict(myself=request.route_url('front'),branchlist=branchlist,check=check,records=records,detail=request.route_url('detail'))
 
@@ -119,8 +133,8 @@ def detail(request):
     finally:
         fcntl.flock(fd,fcntl.LOCK_UN)  #UNLOCK!
         fd.close()
-    tblname=str(check).lower()
-    ormtype=type(tblname,(Base,),{'__tablename__':tblname,'__table_args__':{'autoload':True}})
+    tblname="_version"
+    majorver=check[3:].replace('_STABLE','').replace('_','.')
 
     # 更新ボタンが押された場合はこの処理が実行される
     if 'upload' in request.params or 'conupload' in request.params:
@@ -137,7 +151,7 @@ def detail(request):
         
 
         # UPDATE
-        DBSession.query(ormtype).filter(ormtype.commitid == commitid).update(
+        DBSession.query(CommitTable).filter(CommitTable.commitid == commitid).filter(CommitTable.majorver == majorver).update(
             {"buglevel":buglevel,
              "seclevel":seclevel,
              "snote":snote,
@@ -158,10 +172,9 @@ def detail(request):
             # Search related information
             relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).filter(RelatedCommit.dst_relname != str(check)).all()
             for id in relatedids:
-                dstrel=str(id.dst_relname).lower()
-                dstreltype=type(dstrel,(Base,),{'__tablename__':dstrel,'__table_args__':{'autoload':True}})
+                targetver=id.dst_relname[3:].replace('_STABLE','').replace('_','.')
                 # UPDATE
-                DBSession.query(dstreltype).filter(dstreltype.commitid == id.dst_commitid).update(
+                DBSession.query(CommitTable).filter(CommitTable.commitid == id.dst_commitid).filter(CommitTable.majorver == targetver).update(
                     {"buglevel":buglevel,
                      "seclevel":seclevel,
                      "snote":snote,
@@ -178,11 +191,10 @@ def detail(request):
     if 'relatedid' in request.params:
         # まずは入力されたバージョンテーブルに関連コミットがあるか検索
         # なければ登録しない
-        tblname=str(request.params['relatedrel']).lower()
-        ormtype_tmp=type(tblname,(Base,),{'__tablename__':tblname,'__table_args__':{'autoload':True}})
+        targetver=str(request.params['relatedrel'])[3:].replace('_STABLE','').replace('_','.')
         # 該当するコミットレコードが本当にあるかチェック
         try:
-            nrows = DBSession.query(ormtype_tmp).filter(ormtype_tmp.commitid == request.params['relatedid']).count()
+            nrows = DBSession.query(CommitTable).filter(CommitTable.majorver == targetver).filter(CommitTable.commitid == request.params['relatedid']).count()
             if nrows == 0:
                 raise CustomExceptionContext('Your input commitid does not exist in specified PG-version.')
         except DBAPIError:
@@ -207,7 +219,7 @@ def detail(request):
     # この問題を回避している。
     try:
         # Search commit information.
-        record = DBSession.query(ormtype).filter(ormtype.commitid == commitid).one()
+        record = DBSession.query(CommitTable).filter(CommitTable.majorver == majorver).filter(CommitTable.commitid == commitid).one()
         # Search related information.
         relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all()
     except DBAPIError:

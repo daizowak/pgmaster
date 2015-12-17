@@ -5,6 +5,7 @@ from sqlalchemy import (
     Integer,
     Text,
     )
+from sqlalchemy.dialects.postgresql import DATE,TIMESTAMP,VARCHAR,BIGINT
 from sqlalchemy.ext.declarative import declarative_base
 from zope.sqlalchemy import ZopeTransactionExtension
 from sqlalchemy.orm import (
@@ -32,3 +33,23 @@ class BranchList(Base):
 
     def __init__(self,branch):
         self.branch=branch
+
+class CommitTable(Base):
+    __tablename__='_version'
+    logid=Column('logid',Integer,primary_key=True)
+    commitid=Column('commitid',Text)
+    scommitid=Column('scommitid',Text)
+    commitdate=Column('commitdate',TIMESTAMP)
+    updatetime=Column('updatetime',TIMESTAMP)
+    seclevel=Column('seclevel',Text)
+    reporturl=Column('reporturl',Text)
+    buglevel=Column('buglevel',Text)
+    revision=Column('revision',Text)
+    relememo=Column('relememo',Text)
+    releurl=Column('releurl',Text)
+    genre=Column('genre',Text)
+    snote=Column('snote',Text)
+    note=Column('note',Text)
+    analysys=Column('analysys',Text)
+    keyword=Column('keyword',Text)
+    majorver=Column('majorver',Text)
