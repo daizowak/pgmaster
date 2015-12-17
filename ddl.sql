@@ -64,12 +64,14 @@ ALTER TABLE rel9_3_stable ADD CONSTRAINT vercheck CHECK (majorver='9.3');
 ALTER TABLE rel9_4_stable ADD CONSTRAINT vercheck CHECK (majorver='9.4');
 ALTER TABLE rel9_5_stable ADD CONSTRAINT vercheck CHECK (majorver='9.5');
 
-CREATE OR REPLACE VIEW branchlist AS 
-    SELECT upper(relname) AS branch 
-    FROM pg_class 
-    WHERE oid 
-    IN (
-        SELECT inhrelid FROM pg_inherits WHERE inhparent=(SELECT oid FROM pg_class WHERE relname='_version' limit 1)
-        ) 
-    ORDER BY relname DESC;
+CREATE OR REPLACE VIEW branchlist AS
+ SELECT replace(replace(substring(upper(pg_class.relname::text) from 4),'_STABLE',''),'_','.') AS branch
+   FROM pg_class
+  WHERE (pg_class.oid IN ( SELECT pg_inherits.inhrelid
+           FROM pg_inherits
+          WHERE pg_inherits.inhparent = (( SELECT pg_class_1.oid
+                   FROM pg_class pg_class_1
+                  WHERE pg_class_1.relname = '_version'::name
+                 LIMIT 1))))
+  ORDER BY pg_class.relname DESC;
 
