@@ -19,6 +19,7 @@ logid bigserial primary key  -- テーブル毎にユニークなプライマリ
 ,note   text     -- 当該コミットの日本語メモ
 ,analysys    text     -- 当該コミットの分析情報メモ
 ,keyword   text      -- 検索タグ
+,majorver   text   -- 当該コミットの対象メジャーバージョン 
 );
 
 create table if not exists REL8_4_STABLE(like _version including all) inherits(_version);

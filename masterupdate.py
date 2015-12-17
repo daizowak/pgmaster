@@ -37,6 +37,7 @@ for version in versions:
 
     command="git log --date=short --no-merges --pretty=format:\"%H,%h,%ci\""
     if since is not None:
+        majorver=version[3:].replace('_STABLE','').replace('_','.')  #メジャーバージョンの取得
         command += " --since " + since[0].strftime('%Y-%m-%d')
         records=commands.getoutput(command).split('\n')
         for record in records:
@@ -45,7 +46,7 @@ for version in versions:
             commitdate= record.split(',')[2]
             cur = conn.cursor()
             try:
-                cur.execute("insert into " + version + " (commitid,scommitid,commitdate) values ( %s,%s,%s) ",(commitid,scommitid,commitdate))
+                cur.execute("insert into " + version + " (commitid,scommitid,commitdate,majorver) values ( %s,%s,%s,%s) ",(commitid,scommitid,commitdate,majorver))
                 print commitid + " has inserted."
             except psycopg2.Error as e:
                 print "LOG:" + e.pgerror + "errorcode:"
