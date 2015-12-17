@@ -7,7 +7,7 @@ logid bigserial primary key  -- テーブル毎にユニークなプライマリ
 ,commitid text unique         -- commitid (from git log)
 ,scommitid text unique          -- (short)commitid ( from git log)
 ,commitdate timestamptz              -- commitdate (from git log)
-,updatetime timestamp default now() -- 情報を更新した日付
+,updatetime timestamptz default now() -- 情報を更新した日付
 ,seclevel text  -- セキュリティレベル
 ,reporturl text -- バグ報告URL
 ,buglevel text  -- バグのレベル
@@ -30,6 +30,24 @@ create table if not exists REL9_3_STABLE(like _version including all) inherits(_
 create table if not exists REL9_4_STABLE(like _version including all) inherits(_version);
 create table if not exists REL9_5_STABLE(like _version including all) inherits(_version);
 
+CREATE OR REPLACE FUNCTION commit_insert_trigger_func() RETURNS TRIGGER AS
+$$
+    DECLARE
+    tablename text;
+    BEGIN
+        -- キー値から計算
+        tablename := 'REL'||replace(new.majorver,'.','_')||'_STABLE';
+        -- newを渡す
+        EXECUTE 'INSERT INTO ' || tablename || ' VALUES(($1).*)' USING new;
+        RETURN NULL;
+    END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER commit_insert_trigger
+    BEFORE INSERT ON _version
+    FOR EACH ROW EXECUTE PROCEDURE commit_insert_trigger_func();
+
 create table if not exists RELATEDCOMMIT
 (
 src_commitid text
@@ -37,6 +55,14 @@ src_commitid text
 ,dst_relname text
 ,primary key(src_commitid, dst_commitid)
 );
+
+ALTER TABLE rel8_4_stable ADD CONSTRAINT vercheck CHECK (majorver='8.4');
+ALTER TABLE rel9_0_stable ADD CONSTRAINT vercheck CHECK (majorver='9.0');
+ALTER TABLE rel9_1_stable ADD CONSTRAINT vercheck CHECK (majorver='9.1');
+ALTER TABLE rel9_2_stable ADD CONSTRAINT vercheck CHECK (majorver='9.2');
+ALTER TABLE rel9_3_stable ADD CONSTRAINT vercheck CHECK (majorver='9.3');
+ALTER TABLE rel9_4_stable ADD CONSTRAINT vercheck CHECK (majorver='9.4');
+ALTER TABLE rel9_5_stable ADD CONSTRAINT vercheck CHECK (majorver='9.5');
 
 CREATE OR REPLACE VIEW branchlist AS 
     SELECT upper(relname) AS branch 
