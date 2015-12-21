@@ -30,13 +30,22 @@
           <h2><span class="font-semi-bold">${majorver}</span><span class="smaller"> : <a href="https://github.com/postgres/postgres/commit/${commitid}">${commitid}</a></span></h2>
 	</div>
       </div>
+      <div class="col-md-10">
+      parmalink=> ${myself}?commitid=${commitid}&majorver=${majorver}
+      </div> 
     </div>
     <div>
 	<tal:block repeat="record relatedids">
-	  <div><a href="${myself}?commitid=${record.dst_commitid}&majorver=${record.dst_relname}">${record.dst_commitid}</a> ${record.dst_relname} </div>
+            <div>
+                <form action="${myself}" method="post">
+	            <input type="hidden" name="commitid" value="${record.dst_commitid}">
+                    <input type="hidden" name="majorver" value="${record.dst_relname}">
+	            <input type="submit" name="" value="[${record.dst_relname}] ${record.dst_commitid}">
+                </form>
+            </div>              
 	</tal:block>
     </div>
-    <form action="${myself}"  method="get">
+    <form action="${myself}"  method="post">
 	<input type="hidden" name="commitid" value="${commitid}">
 	<input type="hidden" name="majorver" value="${majorver}">
 	<input type="text" name="relatedid" value="" size="40" maxlength="40" placeholder="ここに関連コミットID(40文字)を入力">
@@ -47,6 +56,7 @@
 	  <option value="9.2">9.2</option>
 	  <option value="9.3">9.3</option>
 	  <option value="9.4">9.4</option>
+          <option value="9.5">9.5</option>
 	</select>
 	<input type="submit" name="insert" value="関連コミットを登録">
     </form>

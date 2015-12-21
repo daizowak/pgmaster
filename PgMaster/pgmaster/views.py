@@ -179,9 +179,8 @@ def detail(request):
             # Search related information
             relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).filter(RelatedCommit.dst_relname != majorver).all()
             for id in relatedids:
-                targetver=id.dst_relname[3:].replace('_STABLE','').replace('_','.')
                 # UPDATE
-                DBSession.query(CommitTable).filter(CommitTable.commitid == id.dst_commitid).filter(CommitTable.majorver == targetver).update(
+                DBSession.query(CommitTable).filter(CommitTable.commitid == id.dst_commitid).filter(CommitTable.majorver == id.dst_relname).update(
                     {"buglevel":buglevel,
                      "seclevel":seclevel,
                      "snote":snote,
