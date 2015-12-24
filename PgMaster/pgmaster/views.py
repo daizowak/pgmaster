@@ -207,10 +207,11 @@ def detail(request):
             raise CustomExceptionContext('Internal Error...')
         
         # 今回追加する関連コミット情報と、既に存在する関連コミットとの関連付けを行う。
-        # ただし、追加する関連コミットが同じバージョンだったら、
-        # すでに存在する異なるバージョンとの関連コミットとの関連付けを行わない
+        # ただし、追加する関連コミットのバージョンがこのページと同じバージョンであるか、
+        # すでに登録されている関連コミットとこのページのバージョンが同じである場合は、
+        # 当該関連コミットとの関連付けを行わない
         for  subrelated in DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all():
-            if majorver == request.params['relatedrel']:
+            if majorver == request.params['relatedrel'] or majorver == subrelated.dst_relname:
                 continue 
             DBSession.add(RelatedCommit(subrelated.dst_commitid,request.params['relatedid'],request.params['relatedrel']))
             DBSession.add(RelatedCommit(request.params['relatedid'],subrelated.dst_commitid,subrelated.dst_relname))
