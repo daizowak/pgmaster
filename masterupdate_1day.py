@@ -21,7 +21,7 @@ os.chdir('master')
 fd = open("../lockfile","w")
 fcntl.flock(fd,fcntl.LOCK_EX)  #LOCK!
 
-versions=commands.getoutput("git branch|cut -c3-|grep ^REL").split('\n') 
+versions=commands.getoutput("git branch|cut -c3-|grep -e ^REL -e ^master").split('\n') 
 #for version in versions:
 #    commands.getoutput("git checkout " + version)
 #    commands.getoutput("git pull")
@@ -37,12 +37,10 @@ for version in versions:
     commands.getoutput("git checkout " + version)
     command="git log --date=short --no-merges --pretty=format:\"%H,%h,%ci\""
     if since is not None:
-        majorver=version[3:].replace('_STABLE','').replace('_','.')  #メジャーバージョンの取得
-        ##### 9.5対応が完了するまでこのチェックは削除厳禁
-        if majorver=='9.5':
-            print "INFO: 9.5 branch is not ready yet."
-            continue
-        ##### 
+        if version == "master":
+            majorver=version
+        else:
+            majorver=version[3:].replace('_STABLE','').replace('_','.')  #メジャーバージョンの取得
         command += " --since \"" + since + "\" --until `date -d \"" + since + " 1 day\" +%Y-%m-%d`"
         records=commands.getoutput(command).split('\n')
         if records[0] == '':

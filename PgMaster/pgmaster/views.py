@@ -52,7 +52,8 @@ rel9_1_stable
 rel9_2_stable
 rel9_3_stable
 rel9_4_stable
-# rel9_5_stable (comming soon!)
+rel9_5_stable
+master
 上記テーブルは全て_versionテーブルを親とした
 パーティションテーブル構成になっている。
 そのため、_versionテーブルに対してINSERT/UPDATE/DELETE/SELECTを
@@ -125,12 +126,16 @@ git checkout->git logは、ロックファイルを用いて
 @view_config(route_name='detail',renderer='templates/detail.pt')
 def detail(request):
     os.chdir("../master")
-    majorver = "9.2"
+    majorver = "9.4"
     if 'majorver' in request.params:
         majorver = request.params['majorver']
 
     # gitコマンド発行用
-    check = "REL" + majorver.replace('.','_') + "_STABLE" 
+    if majorver == "master":
+        check = majorver
+    else:
+        check = "REL" + majorver.replace('.','_') + "_STABLE" 
+
     commitid=request.params['commitid']
     # open a lock file.
     try:

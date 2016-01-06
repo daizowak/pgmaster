@@ -29,6 +29,7 @@ create table if not exists REL9_2_STABLE(like _version including all) inherits(_
 create table if not exists REL9_3_STABLE(like _version including all) inherits(_version);
 create table if not exists REL9_4_STABLE(like _version including all) inherits(_version);
 create table if not exists REL9_5_STABLE(like _version including all) inherits(_version);
+create table if not exists master(like _version including all) inherits(_version);
 
 CREATE OR REPLACE FUNCTION commit_insert_trigger_func() RETURNS TRIGGER AS
 $$
@@ -36,7 +37,11 @@ $$
     tablename text;
     BEGIN
         -- キー値から計算
-        tablename := 'REL'||replace(new.majorver,'.','_')||'_STABLE';
+        IF new.majorver = 'master' THEN
+            tablename := 'master';
+        ELSE
+            tablename := 'REL'||replace(new.majorver,'.','_')||'_STABLE';
+        END IF;
         -- newを渡す
         EXECUTE 'INSERT INTO ' || tablename || ' VALUES(($1).*)' USING new;
         RETURN NULL;
@@ -63,9 +68,12 @@ ALTER TABLE rel9_2_stable ADD CONSTRAINT vercheck CHECK (majorver='9.2');
 ALTER TABLE rel9_3_stable ADD CONSTRAINT vercheck CHECK (majorver='9.3');
 ALTER TABLE rel9_4_stable ADD CONSTRAINT vercheck CHECK (majorver='9.4');
 ALTER TABLE rel9_5_stable ADD CONSTRAINT vercheck CHECK (majorver='9.5');
+ALTER TABLE master        ADD CONSTRAINT vercheck CHECK (majorver='master');
 
 CREATE OR REPLACE VIEW branchlist AS
- SELECT replace(replace(substring(upper(pg_class.relname::text) from 4),'_STABLE',''),'_','.') AS branch
+ SELECT CASE pg_class.relname WHEN 'master' THEN pg_class.relname 
+        ELSE replace(replace(substring(upper(pg_class.relname::text) from 4),'_STABLE',''),'_','.') END 
+        AS branch
    FROM pg_class
   WHERE (pg_class.oid IN ( SELECT pg_inherits.inhrelid
            FROM pg_inherits
