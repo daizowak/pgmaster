@@ -31,7 +31,7 @@
 	</div>
       </div>
       <div class="col-md-10">
-      parmalink=> ${myself}?commitid=${commitid}&majorver=${majorver}
+      parmalink=> <a href="${myself}?commitid=${commitid}&majorver=${majorver}">${myself}?commitid=${commitid}&majorver=${majorver}</a>
       </div> 
     </div>
     <div>
@@ -87,6 +87,7 @@
 		<option value="中">中</option>
 		<option value="小">小</option>
 		<option value="微小">微小</option>
+		<option value="動作変更">動作変更</option>
 		<option value=""/>
 	      </select>
 	    </div>

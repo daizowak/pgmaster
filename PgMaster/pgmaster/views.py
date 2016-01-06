@@ -212,7 +212,11 @@ def detail(request):
         # 当該関連コミットとの関連付けを行わない
         for  subrelated in DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all():
             if majorver == request.params['relatedrel'] or majorver == subrelated.dst_relname:
-                continue 
+                continue
+            #重複する可能性があるので、INSERT INTO ... CONFLICT IGNORE をAP側で実行する
+            nrows = DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == subrelated.dst_commitid).filter(RelatedCommit.dst_commitid == request.params['relatedid']).count()
+            if nrows > 0: #すでに登録済みなので、登録はスキップ
+                continue
             DBSession.add(RelatedCommit(subrelated.dst_commitid,request.params['relatedid'],request.params['relatedrel']))
             DBSession.add(RelatedCommit(request.params['relatedid'],subrelated.dst_commitid,subrelated.dst_relname))
         # 今回登録する関連コミットと当該ページのコミット情報の関連付けを行う。
