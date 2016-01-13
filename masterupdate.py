@@ -36,7 +36,7 @@ for version in versions:
     cur.close()
 
     command="git log --date=short --no-merges --pretty=format:\"%H,%h,%ci\""
-    if since is not None:
+    if since[0] is not None:
         command += " --since " + since[0].strftime('%Y-%m-%d')
     
     if version == "master":
@@ -44,15 +44,15 @@ for version in versions:
     else:    
         majorver=version[3:].replace('_STABLE','').replace('_','.')  #メジャーバージョンの取得
  
-   records=commands.getoutput(command).split('\n')
+    records=commands.getoutput(command).split('\n')
     for record in records:
         commitid= record.split(',')[0]
         scommitid= record.split(',')[1]
         commitdate= record.split(',')[2]
         cur = conn.cursor()
         try:
-        #パーティショントリガにより、それぞれのテーブルに振り分けられる
-        cur.execute("insert into _version (commitid,scommitid,commitdate,majorver) values ( %s,%s,%s,%s) ",(commitid,scommitid,commitdate,majorver))
+            #パーティショントリガにより、それぞれのテーブルに振り分けられる
+            cur.execute("insert into _version (commitid,scommitid,commitdate,majorver) values ( %s,%s,%s,%s) ",(commitid,scommitid,commitdate,majorver))
             print "LOG:" + commitid + " has inserted."
         except psycopg2.Error as e:
             print "LOG:" + e.pgerror + "errorcode:"
