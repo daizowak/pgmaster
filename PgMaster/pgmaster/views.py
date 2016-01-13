@@ -79,7 +79,7 @@ def front(request):
     #そのブランチリストをfrontページのタブとして表示させる
     branchlist=DBSession.query(BranchList).all()
 
-    majorver = "9.4" #default branch
+    majorver = "9.5" #default branch
     if 'majorver' in request.params:
         majorver = request.params['majorver']
 
@@ -126,7 +126,7 @@ git checkout->git logは、ロックファイルを用いて
 @view_config(route_name='detail',renderer='templates/detail.pt')
 def detail(request):
     os.chdir("../master")
-    majorver = "9.4"
+    majorver = "9.5"
     if 'majorver' in request.params:
         majorver = request.params['majorver']
 
@@ -252,7 +252,7 @@ git logの検索を行っている。
 @view_config(route_name='log',renderer='templates/log.pt')
 def log(request):
     os.chdir("../master")
-    check = "REL9_4_STABLE"
+    check = "REL9_5_STABLE"
     if 'branch' in request.params:
         check = request.params['branch']
 
