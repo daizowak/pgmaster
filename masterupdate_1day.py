@@ -34,7 +34,11 @@ print "LOG: connect"
 # main process
 for version in versions:
     print "LOG: processing...." + version
-    commands.getoutput("git checkout " + version)
+    res = commands.getstatusoutput("git checkout " + version)
+    print res[1]
+    if res[0] != 0:
+        print "ERROR: command failed => git checkout" + version
+        continue
     command="git log --date=short --no-merges --pretty=format:\"%H,%h,%ci\""
     if since is not None:
         if version == "master":

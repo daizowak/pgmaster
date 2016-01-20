@@ -28,7 +28,11 @@ print "LOG: connect"
 # main process
 for version in versions:
     print "LOG: processing...." + version
-    commands.getoutput("git checkout " + version)
+    res = commands.getstatusoutput("git checkout " + version)
+    print res[1]
+    if res[0] != 0:
+        print "ERROR: command failed => git checkout" + version
+        continue
     cur = conn.cursor()
     cur.execute("select (max(commitdate) - interval '1 days')::date from " + version + " limit 1")
     since=cur.fetchone()
