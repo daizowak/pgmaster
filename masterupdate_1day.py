@@ -60,7 +60,7 @@ for version in versions:
                 cur.execute("insert into _version (commitid,scommitid,commitdate,majorver) values ( %s,%s,%s,%s) ",(commitid,scommitid,commitdate,majorver))
                 print commitid + " has inserted."
             except psycopg2.Error as e:
-                print "LOG:" + e.pgerror + "errorcode:"
+                print "LOG:" + e.pgerror + " ERRORCODE:" + e.pgcode
                 print "INFO: we will skip the record because it exists already. let's read next one."
                 pass
             conn.commit()
