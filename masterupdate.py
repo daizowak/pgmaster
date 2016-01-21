@@ -41,13 +41,11 @@ for version in versions:
 
     command="git log --date=short --no-merges --pretty=format:\"%H,%h,%ci\""
     if since[0] is not None:
-        command += " --since " + since[0].strftime('%Y-%m-%d')
-    
+        command += " --since=" + since[0].strftime('%Y-%m-%d')
     if version == "master":
         majorver=version
     else:    
         majorver=version[3:].replace('_STABLE','').replace('_','.')  #メジャーバージョンの取得
- 
     records=commands.getoutput(command).split('\n')
     for record in records:
         commitid= record.split(',')[0]
