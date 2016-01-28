@@ -45,7 +45,7 @@ for version in versions:
             majorver=version
         else:
             majorver=version[3:].replace('_STABLE','').replace('_','.')  #メジャーバージョンの取得
-        command += " --since \"" + since + "\" --until `date -d \"" + since + " 1 day\" +%Y-%m-%d`"
+        command += " --since=\"" + since + "\" --until=`date -d \"" + since + " 1 day\" +%Y-%m-%d`"
         records=commands.getoutput(command).split('\n')
         if records[0] == '':
             print 'LOG: no record.'
