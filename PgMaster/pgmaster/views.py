@@ -142,7 +142,9 @@ def detail(request):
         fd = open("../lockfile","w")
         fcntl.flock(fd,fcntl.LOCK_EX)  #LOCK!
         commands.getoutput("git checkout " + check)
-        description=commands.getoutput("git log --stat -1 " + commitid )
+        description=commands.getoutput("git log --parents --stat -1 " + commitid )
+        # このコミットの前のコミット番号を取得する
+        parent=description.splitlines()[0].split()[2]
         diff=commands.getoutput("git log -p -1 --pretty=format: " + commitid )
     finally:
         fcntl.flock(fd,fcntl.LOCK_UN)  #UNLOCK!
@@ -240,7 +242,7 @@ def detail(request):
         relatedids=DBSession.query(RelatedCommit).filter(RelatedCommit.src_commitid == commitid).all()
     except DBAPIError:
         raise CustomExceptionContext('Internal Error...(Failed search of specified commitid information)')
-    return dict(myself=request.route_url('detail'),top=request.route_url('front'),detail=unicode(description,'utf-8','ignore'),diff=unicode(diff,'utf-8','ignore'),record=record,commitid=commitid,majorver=majorver,relatedids=relatedids)
+    return dict(parent=parent,myself=request.route_url('detail'),top=request.route_url('front'),detail=unicode(description,'utf-8','ignore'),diff=unicode(diff,'utf-8','ignore'),record=record,commitid=commitid,majorver=majorver,relatedids=relatedids)
 
 # git検索用ページ(コミットリポジトリとは独立して存在)
 """

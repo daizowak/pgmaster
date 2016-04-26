@@ -33,6 +33,9 @@
       <div class="col-md-10">
       parmalink=> <a href="${myself}?commitid=${commitid}&majorver=${majorver}">${myself}?commitid=${commitid}&majorver=${majorver}</a>
       </div> 
+      <div class="col-md-10">
+      parentlink=> <a href="${myself}?commitid=${parent}&majorver=${majorver}">${myself}?commitid=${parent}&majorver=${majorver}</a>
+      </div> 
     </div>
     <div>
 	<tal:block repeat="record relatedids">
