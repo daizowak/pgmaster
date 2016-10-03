@@ -34,6 +34,7 @@
 
     <div>
       <form action="${myself}" method="get">
+        <input type="submit" name="branch" value="REL9_6_STABLE"/>
 	<input type="submit" name="branch" value="REL9_5_STABLE"/>
 	<input type="submit" name="branch" value="REL9_4_STABLE"/>
 	<input type="submit" name="branch" value="REL9_3_STABLE"/>

@@ -1,4 +1,3 @@
-export PATH=/usr/pgsql-9.3/bin:${PATH}
 export PGPORT=9999
 export PGDATA=/opt/pgsql/data
 export PGDATABASE=pgmaster

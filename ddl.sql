@@ -29,6 +29,7 @@ create table if not exists REL9_2_STABLE(like _version including all) inherits(_
 create table if not exists REL9_3_STABLE(like _version including all) inherits(_version);
 create table if not exists REL9_4_STABLE(like _version including all) inherits(_version);
 create table if not exists REL9_5_STABLE(like _version including all) inherits(_version);
+create table if not exists REL9_6_STABLE(like _version including all) inherits(_version);
 create table if not exists master(like _version including all) inherits(_version);
 
 CREATE OR REPLACE FUNCTION commit_insert_trigger_func() RETURNS TRIGGER AS
@@ -53,7 +54,7 @@ CREATE TRIGGER commit_insert_trigger
     BEFORE INSERT ON _version
     FOR EACH ROW EXECUTE PROCEDURE commit_insert_trigger_func();
 
-create table if not exists RELATEDCOMMIT
+create table if not exists relatedcommit 
 (
 src_commitid text
 ,dst_commitid text
@@ -68,6 +69,7 @@ ALTER TABLE rel9_2_stable ADD CONSTRAINT vercheck CHECK (majorver='9.2');
 ALTER TABLE rel9_3_stable ADD CONSTRAINT vercheck CHECK (majorver='9.3');
 ALTER TABLE rel9_4_stable ADD CONSTRAINT vercheck CHECK (majorver='9.4');
 ALTER TABLE rel9_5_stable ADD CONSTRAINT vercheck CHECK (majorver='9.5');
+ALTER TABLE rel9_6_stable ADD CONSTRAINT vercheck CHECK (majorver='9.6');
 ALTER TABLE master        ADD CONSTRAINT vercheck CHECK (majorver='master');
 
 CREATE OR REPLACE VIEW branchlist AS
@@ -82,4 +84,20 @@ CREATE OR REPLACE VIEW branchlist AS
                   WHERE pg_class_1.relname = '_version'::name
                  LIMIT 1))))
   ORDER BY pg_class.relname DESC;
+
+CREATE OR REPLACE VIEW registration_stats AS
+SELECT
+weektbl.start,
+weektbl."end",
+count(_version.majorver) as registerd,
+_version.majorver
+FROM (
+    SELECT 
+    start.start,
+    start.start + '7 days'::interval - '00:00:01'::interval AS "end"
+    FROM generate_series('2015-04-04 00:00:00+09'::timestamp with time zone, '2017-12-31 00:00:00'::timestamp without time zone::timestamp with time zone, '7 days'::interval) start(start)) weektbl
+JOIN _version ON _version.commitdate >= weektbl.start AND _version.commitdate <= weektbl."end"
+GROUP BY weektbl.start,weektbl."end",_version.majorver
+ORDER BY weektbl.start,_version.majorver asc;
+
 

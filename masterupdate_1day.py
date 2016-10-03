@@ -12,7 +12,7 @@ since = sys.argv[1]
 
 print since
 
-connstr = "dbname=pgmaster host=localhost user=postgres port=9999"
+connstr = "dbname=pgmaster host=localhost user=postgres password=postgres port=9999"
 
 # mv postgres git repository.
 os.chdir('master')

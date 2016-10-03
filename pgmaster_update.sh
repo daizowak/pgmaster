@@ -15,7 +15,7 @@ else
 fi
 
 echo -n "INFO: connection test...."
-mes=`psql -l 2>&1`
+mes=`psql -l pgmaster 2>&1`
 if [ $? -eq  0 ];
 then
     echo "OK"
@@ -35,7 +35,7 @@ then
 fi
 
 echo -n "INFO: dump is working..."
-mes=`pg_dump -Fc -f bak/${filename} 2>&1`
+mes=`pg_dump -Fc -f bak/${filename} pgmaster 2>&1`
 if [ $? -eq 0 ];
 then
     echo "OK"

@@ -6,7 +6,7 @@ import psycopg2
 import datetime
 import fcntl
 
-connstr = "dbname=pgmaster host=localhost user=postgres port=9999"
+connstr = "dbname=pgmaster host=localhost user=postgres password=postgres port=9999"
 
 # mv postgres git repository.
 os.chdir('master')

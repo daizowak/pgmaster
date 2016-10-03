@@ -53,6 +53,7 @@ rel9_2_stable
 rel9_3_stable
 rel9_4_stable
 rel9_5_stable
+rel9_6_stable
 master
 上記テーブルは全て_versionテーブルを親とした
 パーティションテーブル構成になっている。
@@ -79,7 +80,7 @@ def front(request):
     #そのブランチリストをfrontページのタブとして表示させる
     branchlist=DBSession.query(BranchList).all()
 
-    majorver = "9.5" #default branch
+    majorver = "9.6" #default branch
     if 'majorver' in request.params:
         majorver = request.params['majorver']
 
@@ -126,7 +127,7 @@ git checkout->git logは、ロックファイルを用いて
 @view_config(route_name='detail',renderer='templates/detail.pt')
 def detail(request):
     os.chdir("../master")
-    majorver = "9.5"
+    majorver = "9.6"
     if 'majorver' in request.params:
         majorver = request.params['majorver']
 
@@ -254,7 +255,7 @@ git logの検索を行っている。
 @view_config(route_name='log',renderer='templates/log.pt')
 def log(request):
     os.chdir("../master")
-    check = "REL9_5_STABLE"
+    check = "REL9_6_STABLE"
     if 'branch' in request.params:
         check = request.params['branch']
 
